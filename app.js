@@ -9,31 +9,34 @@ var app = angular.module('ludashiApp', []);
 app.controller('MainListCtrl', function($scope, $http, $sce, listService) {
 	listService.getList().then(
 		function(data){
-			// $scope.listData = $sce.trustAsHtml(data); 
-			// 当需要把html插入到dom中时要信任此内容才可以，为了安全。
-
 			$scope.listData  = data;
 		},
 		function(err){
 			console.log(err);
 		});
-
 });
 
 app.service('listService', ['$http', '$q', 'BaseUrl', function($http, $q, BaseUrl){
 	var base_url = BaseUrl;
-	var part_url = '/html/part/9.html';
+	var part_url = '/html/gndy/dyzz/index.html';
 	var replace_token = '/html/article';
 	this.getList = function(){
 		var deferred = $q.defer();
 		$http.get(base_url + part_url).success(function(data){
 			// var jq = angular.element(data);
 			// var dataList = jq.find("div")[1].children[0].innerHTML;
-			var dataList = $("div>ul>li>a", data);
+
+			// var dataList = $("div>ul>table>tbody>tr>td>a", data);
+			// get ... <a href="/11/">音乐歌舞题材电影</a>
+
+			var dataList = $("div>ul>table>tbody>tr>td>b>a", data);
+
+			// console.log(dataList);
+
 			var returnItemList = [];
-			for (var i = dataList.length - 1; i >= 0; i--) {
+			for (var i = 0; i < dataList.length; i++) {
 				var nodeStr = dataList[i];
-				// console.log(nodeStr, typeof(nodeStr));
+				// console.log(nodeStrtab, typeof(nodeStr));
 				returnItemList.push(
 				{	
 					'title': nodeStr.text,
@@ -52,23 +55,21 @@ app.service('listService', ['$http', '$q', 'BaseUrl', function($http, $q, BaseUr
 	
 }]);
 
-app.service('getPicsService', ['$http', '$q', function($http, $q){
-	this.getPicsList = function(url) {
+app.service('getDownloadLinkService', ['$http', '$q', function($http, $q){
+	this.getDownloadLink = function(url) {
 		var deferred = $q.defer();
 		$http.get(url).success(function(data){
 			// console.log(data);
-			var returnPicItems = [];
-			var dataList = $("div>p>img", data);
+			var downloadLink = $("div>div>ul>div>table>tbody>tr>td>a", data);
+			
+			if(downloadLink.length > 1) {
+				// console.log('before:' , downloadLink);
+				downloadLink = downloadLink.slice(-1); 
+				// console.log('after:' , downloadLink);
 
-			for (var i = dataList.length - 1; i >= 0; i--) {
-				var imgTag = dataList[i];
-				var img = {
-					'url': imgTag.src
-				}
-				returnPicItems.push(img);
 			}
 
-			deferred.resolve(returnPicItems);
+			deferred.resolve(downloadLink.text());
 
 		}).error(function(err){
 			console.log(err);
@@ -78,24 +79,24 @@ app.service('getPicsService', ['$http', '$q', function($http, $q){
 	}
 }])
 
-app.directive('sexPictures',function(BaseUrl, getPicsService){
+app.directive('onekeyDownload',function(BaseUrl, getDownloadLinkService){
 	// Runs during compile
 	return {
 		scope: {
 			url: '@'
 		}, 
 		controller: function($scope, $element, $attrs) {
-			getPicsService.getPicsList($scope.url).then(function(data){
-				$scope.pics = data;
+			getDownloadLinkService.getDownloadLink($scope.url).then(function(data){
+				$scope.link = data;
 			},function(err){
 				console.log(err);
 			})
 		},
 		restrict: 'EA', // E = Element, A = Attribute, C = Class, M = Comment
-		template: '<div ng-repeat="pic in pics"><img ng-src={{pic.url}}></div>',
+		template: '<a ng-href="{{ link }}">{{link}}</a>',
 		// template: '<div ng-repeat="pic in pics">{{pic.url}}</div>'
 		//replace: true // 报错：(evaluating 'element.setAttribute(name, value)'
 	};
 });
 
-app.constant('BaseUrl', 'http://www.baise888.com');
+app.constant('BaseUrl', 'http://www.dy2018.com');

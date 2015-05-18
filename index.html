@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>get ludashi.com's girls pictures</title>
+	<title>电影天堂-最新电影-2015 </title>
 	<script type="text/javascript" src="jquery-1.3.2.js"></script>
 	<script type="text/javascript" src="angular.js"></script>
 	<script type="text/javascript" src="app.js"></script>
 </head>
 <body ng-app="ludashiApp">
 	<div ng-controller="MainListCtrl">
-		<h3>今日亚洲新图列表</h3>
+		<h3>2015最新电影</h3>
 		<!-- <div ng-bind-html="listData"></div> -->
 		<ul>
 			<li ng-repeat="item in listData">
-				<a ng-href="{{item.url}}">{{item.title}}</a>
-				<sex-pictures url="{{item.url}}"></sex-pictures>
+				<span>[{{$index +1 }}].{{item.title}}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+				<onekey-download url="{{item.url}}"></onekey-download>
 			</li>
 		</ul>
 	</div>
